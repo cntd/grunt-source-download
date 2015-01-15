@@ -6,6 +6,7 @@
  * Licensed under the MIT license.
  */
 var exec = require('child_process').exec;
+var readDir = require('readdir');
 'use strict';
 
 module.exports = function (grunt) {
@@ -14,7 +15,7 @@ module.exports = function (grunt) {
 	// creation: http://gruntjs.com/creating-tasks
 
 	var run_task = function(task, subtask, config) {
-		var default_config = grunt.config.get(task) || config;
+		var default_config = config || grunt.config.get(task);
 		grunt.config.set(task, default_config);
 		grunt.task.run(task + ':' + subtask);
 	};
@@ -34,9 +35,7 @@ module.exports = function (grunt) {
 			sourcePublic: {
 				src: ['public/app/' + options.name + '/elements']
 			},
-			sourceImages: {
-				src: 'public/app/' + options.name + '/elements/images/tmp'
-			}
+
 		};
 
 		grunt.loadNpmTasks('grunt-untar');
@@ -92,20 +91,36 @@ module.exports = function (grunt) {
 			}
 		};
 		for(var i = 0; i < options.paths.length; i++) {
-			copyOptions['sourceImages-' + options.paths[i]] = {
-				files: [
-					{expand: true, cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + options.paths[i] + '/', src: '**/*', dest: 'public/app/' + options.name + '/elements/images'}
-				]
-			}
+			var path = options.paths[i];
+			grunt.registerTask('readFolders' + path, '', function() {
+				var dirs = grunt.file.expand({cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/'}, '*');
+				for(var j = 0; j < dirs.length; j++) {
+					copyOptions['source' + j] = {
+						files: [
+							{expand: true, cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/' + dirs[j], src: '**/*', dest: 'public/app/' + options.name + '/elements/images'}
+						]
+					}
+					run_task('copy', 'source' + j, copyOptions);
+				}
+			});
+
 		}
+
 		run_task('copy', 'source', copyOptions);
 		for(var i = 0; i < options.paths.length; i++) {
-			run_task('copy', 'sourceImages-' + options.paths[i], copyOptions);
+			run_task('readFolders' + options.paths[i]);
+
 		}
 
-		run_task('clean', 'sourceImages', cleanOptions);
+		run_task('clean', 'source', {
+			source: {
+				src: 'public/app/' + options.name + '/elements/images/tmp'
+			}
+		});
 
 		run_task('clean', 'source', cleanOptions);
+
+
 
 
 		////Iterate over all specified file groups.

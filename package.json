@@ -1,7 +1,7 @@
 {
   "name": "grunt-source-download",
   "description": "Download files from source for specific project and version",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "",
   "author": {
     "name": "Stas Karpov",
@@ -37,5 +37,8 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "readdir": "0.0.13"
+  }
 }
