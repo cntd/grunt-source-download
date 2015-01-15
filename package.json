@@ -1,0 +1,41 @@
+{
+  "name": "grunt-source-download",
+  "description": "Download files from source for specific project and version",
+  "version": "0.2.0",
+  "homepage": "",
+  "author": {
+    "name": "Stas Karpov",
+    "email": "karpov@kodeks.ru"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://karpov:swordfish1@phd.box.dmz/diffusion/SRC/source.git"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
