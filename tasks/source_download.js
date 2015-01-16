@@ -35,7 +35,9 @@ module.exports = function (grunt) {
 			sourcePublic: {
 				src: ['public/app/' + options.name + '/elements']
 			},
-
+			sourceImages: {
+				src: 'public/app/' + options.name + '/elements/images/tmp'
+			}
 		};
 
 		grunt.loadNpmTasks('grunt-untar');
@@ -86,6 +88,7 @@ module.exports = function (grunt) {
 				files: [
 					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.css', 'tmp/source_docs_files/**/*.css.map'], dest: 'public/app/' + options.name + '/elements/stylesheets/css'},
 					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.js'], dest: 'public/app/' + options.name + '/elements/js'},
+					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/app/' + options.name + '/elements/fonts'},
 					{expand: true, src: images, dest: 'public/app/' + options.name + '/elements/images'}
 				]
 			}
@@ -97,7 +100,7 @@ module.exports = function (grunt) {
 				for(var j = 0; j < dirs.length; j++) {
 					copyOptions['source' + j] = {
 						files: [
-							{expand: true, cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/' + dirs[j], src: '**/*', dest: 'public/app/' + options.name + '/elements/images'}
+							{expand: true, cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/' + dirs[j] + '/images', src: '**/*', dest: 'public/app/' + options.name + '/elements/images'}
 						]
 					}
 					run_task('copy', 'source' + j, copyOptions);
@@ -109,14 +112,9 @@ module.exports = function (grunt) {
 		run_task('copy', 'source', copyOptions);
 		for(var i = 0; i < options.paths.length; i++) {
 			run_task('readFolders' + options.paths[i]);
-
 		}
 
-		run_task('clean', 'source', {
-			source: {
-				src: 'public/app/' + options.name + '/elements/images/tmp'
-			}
-		});
+		run_task('clean', 'sourceImages', cleanOptions);
 
 		run_task('clean', 'source', cleanOptions);
 

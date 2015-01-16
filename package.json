@@ -1,7 +1,7 @@
 {
   "name": "grunt-source-download",
   "description": "Download files from source for specific project and version",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage": "",
   "author": {
     "name": "Stas Karpov",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://karpov:swordfish1@phd.box.dmz/diffusion/SRC/source.git"
+    "url": "https://github.com/cntd/grunt-source-download.git"
   },
   "bugs": {
     "url": ""
