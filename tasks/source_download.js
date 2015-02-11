@@ -31,12 +31,6 @@ module.exports = function (grunt) {
 		var cleanOptions = {
 			source: {
 				src: ['tmp/source_repo', 'tmp/source_docs_files.tar', 'tmp/source_docs_files']
-			},
-			sourcePublic: {
-				src: ['public/app/' + options.name + '/elements']
-			},
-			sourceImages: {
-				src: 'public/app/' + options.name + '/elements/images/tmp'
 			}
 		};
 
@@ -56,20 +50,20 @@ module.exports = function (grunt) {
 				}
 			}
 		});
+		options.paths.push('kit');
 
+		var paths = options.paths.map(function(item) { return 'user/projects/' + item; });
 		run_task('gitarchive', 'source', {
 			source: {
 				options: {
 					format: 'tar',
 					remote: 'tmp/source_repo',
-					path: options.paths,
+					path: paths,
 					output: 'tmp/source_docs_files.tar',
 					treeIsh: options.tag
 				}
 			}
 		});
-
-		run_task('clean', 'sourcePublic', cleanOptions);
 
 		run_task('untar', 'source', {
 			source: {
@@ -82,39 +76,100 @@ module.exports = function (grunt) {
 			}
 		});
 
-		var images = ['tmp/source_docs_files/**/*.jpg', 'tmp/source_docs_files/**/*.png', 'tmp/source_docs_files/**/*.gif'];
-		var copyOptions = {
-			source: {
-				files: [
-					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.css', 'tmp/source_docs_files/**/*.css.map'], dest: 'public/app/' + options.name + '/elements/stylesheets/css'},
-					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.js'], dest: 'public/app/' + options.name + '/elements/js'},
-					{expand: true, flatten: true, src: ['tmp/source_docs_files/**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/app/' + options.name + '/elements/fonts'},
-					{expand: true, src: images, dest: 'public/app/' + options.name + '/elements/images'}
-				]
-			}
-		};
+		var copyOptions = {};
 		for(var i = 0; i < options.paths.length; i++) {
 			var path = options.paths[i];
-			grunt.registerTask('readFolders' + path, '', function() {
-				var dirs = grunt.file.expand({cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/'}, '*');
-				for(var j = 0; j < dirs.length; j++) {
-					copyOptions['source' + j] = {
-						files: [
-							{expand: true, cwd: 'public/app/' + options.name + '/elements/images/tmp/source_docs_files/' + path + '/' + dirs[j] + '/images', src: '**/*', dest: 'public/app/' + options.name + '/elements/images'}
-						]
+
+			// Сперва удаляем что было
+			cleanOptions['clean' + path] = {
+				src: ['public/app/' + path]
+			};
+			cleanOptions['sourceImages'+ path] = {
+				src: ['public/app/' + path + '/images/tmp']
+			};
+			cleanOptions['sourceCss'+ path] = {
+				src: ['public/app/' + path + '/stylesheets/tmp']
+			};
+			cleanOptions['sourceJs'+ path] = {
+				src: ['public/app/' + path + '/js/tmp']
+			};
+			cleanOptions['sourceFonts'+ path] = {
+				src: ['public/app/' + path + '/fonts/tmp']
+			};
+			run_task('clean', 'clean' + path, cleanOptions);
+
+			// Копируем все содержимое, включая кривую структуру папок
+			copyOptions['source_copy' + path] = {
+				files: [
+					{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.css', 'tmp/source_docs_files/user/projects/' + path + '/**/*.css.map'], dest: 'public/app/' + path + '/stylesheets'},
+					{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.js'], dest: 'public/app/' + path + '/js'},
+					{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/app/' + path + '/fonts'},
+					{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.{jpg,png,gif}'], dest: 'public/app/' + path + '/images'}
+				]
+			};
+			run_task('copy', 'source_copy' + path, copyOptions);
+
+			// Таск для обрезки лишних путей типа tmp/source_docs_files ...
+			(function(path) {
+				grunt.registerTask('readFolders' + path, '', function() {
+
+					// Копирование картинок
+					var dirs = grunt.file.expand({cwd: 'public/app/' + path + '/images/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+					for(var j = 0; j < dirs.length; j++) {
+						copyOptions['source_images' + j] = {
+							files: [
+								{expand: true, cwd: 'public/app/' + path + '/images/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/images', src: '**/*', dest: 'public/app/' + path + '/images'}
+							]
+						}
+						run_task('copy', 'source_images' + j, copyOptions);
 					}
-					run_task('copy', 'source' + j, copyOptions);
-				}
-			});
+
+					// Копирование шрифтов
+					dirs = grunt.file.expand({cwd: 'public/app/' + path + '/fonts/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+					for(var j = 0; j < dirs.length; j++) {
+						copyOptions['source_fonts' + j] = {
+							files: [
+								{expand: true, cwd: 'public/app/' + path + '/fonts/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/fonts', src: '**/*', dest: 'public/app/' + path + '/fonts'}
+							]
+						}
+						run_task('copy', 'source_fonts' + j, copyOptions);
+					}
+
+					// Копирование скриптов
+					dirs = grunt.file.expand({cwd: 'public/app/' + path + '/js/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+					for(var j = 0; j < dirs.length; j++) {
+						copyOptions['source_js' + j] = {
+							files: [
+								{expand: true, cwd: 'public/app/' + path + '/js/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/js', src: '**/*', dest: 'public/app/' + path + '/js'}
+							]
+						}
+						run_task('copy', 'source_js' + j, copyOptions);
+					}
+
+					// Копирование стилей
+					dirs = grunt.file.expand({cwd: 'public/app/' + path + '/stylesheets/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+					for(var j = 0; j < dirs.length; j++) {
+						copyOptions['source_stylesheets' + j] = {
+							files: [
+								{expand: true, cwd: 'public/app/' + path + '/stylesheets/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/stylesheets', src: '**/*', dest: 'public/app/' + path + '/stylesheets'}
+							]
+						}
+						run_task('copy', 'source_stylesheets' + j, copyOptions);
+					}
+				});
+			})(path);
+
 
 		}
 
-		run_task('copy', 'source', copyOptions);
 		for(var i = 0; i < options.paths.length; i++) {
 			run_task('readFolders' + options.paths[i]);
+			run_task('clean', 'sourceImages' + options.paths[i], cleanOptions);
+			run_task('clean', 'sourceCss' + options.paths[i], cleanOptions);
+			run_task('clean', 'sourceJs' + options.paths[i], cleanOptions);
+			run_task('clean', 'sourceFonts' + options.paths[i], cleanOptions);
 		}
 
-		run_task('clean', 'sourceImages', cleanOptions);
 
 		run_task('clean', 'source', cleanOptions);
 
