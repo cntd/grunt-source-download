@@ -74,36 +74,36 @@ module.exports = function (grunt) {
 			}
 		});
 
+		// Сперва удаляем все, что было
+		cleanOptions['clean' + path] = {
+			src: ['public/' + options.path]
+		};
+
+		run_task('clean', 'clean' + path, cleanOptions);
+
 		var copyOptions = {};
 		for(var i = 0; i < options.projects.length; i++) {
 			var path = options.projects[i];
 
-			// Сперва удаляем все, что было
-			cleanOptions['clean' + path] = {
-				src: ['public/' + options.path]
-			};
-
 			// Удаляем папку tmp из картинок
-			cleanOptions['sourceImages'+ path] = {
-				src: ['public/app/' + path + '/images/tmp']
-			};
-
-			// Удаляем папку tmp из стилей
-			cleanOptions['sourceCss'+ path] = {
-				src: ['public/app/' + path + '/stylesheets/tmp']
-			};
-
-			// Удаляем папку tmp из скриптов
-			cleanOptions['sourceJs'+ path] = {
-				src: ['public/app/' + path + '/js/tmp']
-			};
-
-			// Удаляем папку tmp из шрифтов
-			cleanOptions['sourceFonts'+ path] = {
-				src: ['public/app/' + path + '/fonts/tmp']
-			};
-
-			run_task('clean', 'clean' + path, cleanOptions);
+			//cleanOptions['sourceImages'+ path] = {
+			//	src: ['public/app/' + path + '/images/tmp']
+			//};
+			//
+			//// Удаляем папку tmp из стилей
+			//cleanOptions['sourceCss'+ path] = {
+			//	src: ['public/app/' + path + '/stylesheets/tmp']
+			//};
+			//
+			//// Удаляем папку tmp из скриптов
+			//cleanOptions['sourceJs'+ path] = {
+			//	src: ['public/app/' + path + '/js/tmp']
+			//};
+			//
+			//// Удаляем папку tmp из шрифтов
+			//cleanOptions['sourceFonts'+ path] = {
+			//	src: ['public/app/' + path + '/fonts/tmp']
+			//};
 
 			// Копируем все содержимое, включая кривую структуру папок
 			//copyOptions['source_copy' + path] = {
