@@ -50,13 +50,13 @@ module.exports = function (grunt) {
 			}
 		});
 
-		var paths = options.projects.map(function(item) { return 'user/projects/' + item; });
+		var projects = options.projects.map(function(item) { return 'user/projects/' + item; });
 		run_task('gitarchive', 'source', {
 			source: {
 				options: {
 					format: 'tar',
 					remote: 'tmp/source_repo',
-					path: paths,
+					path: projects,
 					output: 'tmp/source_docs_files.tar',
 					treeIsh: options.tag
 				}
@@ -75,114 +75,114 @@ module.exports = function (grunt) {
 		});
 
 		// Сперва удаляем все, что было
-		cleanOptions['clean' + path] = {
-			src: ['public/' + options.path]
+		cleanOptions['clean' + project] = {
+			src: ['public/' + options.project]
 		};
 
-		run_task('clean', 'clean' + path, cleanOptions);
+		run_task('clean', 'clean' + project, cleanOptions);
 
 		var copyOptions = {};
 		for(var i = 0; i < options.projects.length; i++) {
-			var path = options.projects[i];
+			var project = options.projects[i];
 
 			// Удаляем папку tmp из картинок
-			//cleanOptions['sourceImages'+ path] = {
-			//	src: ['public/app/' + path + '/images/tmp']
+			//cleanOptions['sourceImages'+ project] = {
+			//	src: ['public/app/' + project + '/images/tmp']
 			//};
 			//
 			//// Удаляем папку tmp из стилей
-			//cleanOptions['sourceCss'+ path] = {
-			//	src: ['public/app/' + path + '/stylesheets/tmp']
+			//cleanOptions['sourceCss'+ project] = {
+			//	src: ['public/app/' + project + '/stylesheets/tmp']
 			//};
 			//
 			//// Удаляем папку tmp из скриптов
-			//cleanOptions['sourceJs'+ path] = {
-			//	src: ['public/app/' + path + '/js/tmp']
+			//cleanOptions['sourceJs'+ project] = {
+			//	src: ['public/app/' + project + '/js/tmp']
 			//};
 			//
 			//// Удаляем папку tmp из шрифтов
-			//cleanOptions['sourceFonts'+ path] = {
-			//	src: ['public/app/' + path + '/fonts/tmp']
+			//cleanOptions['sourceFonts'+ project] = {
+			//	src: ['public/app/' + project + '/fonts/tmp']
 			//};
 
 			// Копируем все содержимое, включая кривую структуру папок
-			//copyOptions['source_copy' + path] = {
+			//copyOptions['source_copy' + project] = {
 			//	files: [
-			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.css', 'tmp/source_docs_files/user/projects/' + path + '/**/*.css.map'], dest: 'public/app/' + path + '/stylesheets'},
-			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.js'], dest: 'public/app/' + path + '/js'},
-			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/app/' + path + '/fonts'},
-			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + path + '/**/*.{jpg,png,gif}'], dest: 'public/app/' + path + '/images'}
+			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + project + '/**/*.css', 'tmp/source_docs_files/user/projects/' + project + '/**/*.css.map'], dest: 'public/app/' + project + '/stylesheets'},
+			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + project + '/**/*.js'], dest: 'public/app/' + project + '/js'},
+			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + project + '/**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/app/' + project + '/fonts'},
+			//		{expand: true, src: ['tmp/source_docs_files/user/projects/' + project + '/**/*.{jpg,png,gif}'], dest: 'public/app/' + project + '/images'}
 			//	]
 			//};
-			copyOptions['source_copy' + path] = {
+			copyOptions['source_copy' + project] = {
 				files: [
-					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + path, src: ['**/*.sass'], dest: 'public/' + options.path + '/' + path + '/stylesheets'},
-					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + path, src: ['**/*.js'], dest: 'public/' + options.path + '/' + path + '/js'},
-					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + path, src: ['**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/' + options.path + '/' + path + '/fonts'},
-					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + path, src: ['**/*.{jpg,png,gif}'], dest: 'public/' + options.path + '/' + path + '/images'}
+					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{sass,js,eot,svg,ttf,woff,woff2,otf,jpg,png,gif}'], dest: 'public/' + options.path + '/' + project},
+					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.js'], dest: 'public/' + options.path + '/' + project},
+					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/' + options.path + '/' + project},
+					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{jpg,png,gif}'], dest: 'public/' + options.path + '/' + project}
 				]
 			};
-			run_task('copy', 'source_copy' + path, copyOptions);
+			run_task('copy', 'source_copy' + project, copyOptions);
 
 			// Таск для обрезки лишних путей типа tmp/source_docs_files ...
-			//(function(path) {
-			//	grunt.registerTask('readFolders' + path, '', function() {
+			//(function(project) {
+			//	grunt.registerTask('readFolders' + project, '', function() {
 			//
 			//		// Копирование картинок
-			//		var dirs = grunt.file.expand({cwd: 'public/app/' + path + '/images/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+			//		var dirs = grunt.file.expand({cwd: 'public/app/' + project + '/images/tmp/source_docs_files/user/projects/' + project + '/'}, '*');
 			//		for(var j = 0; j < dirs.length; j++) {
 			//			copyOptions['source_images' + j] = {
 			//				files: [
-			//					{expand: true, cwd: 'public/app/' + path + '/images/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/images', src: '**/*', dest: 'public/app/' + path + '/images'}
+			//					{expand: true, cwd: 'public/app/' + project + '/images/tmp/source_docs_files/user/projects/' + project + '/' + dirs[j] + '/images', src: '**/*', dest: 'public/app/' + project + '/images'}
 			//				]
 			//			}
 			//			run_task('copy', 'source_images' + j, copyOptions);
 			//		}
 			//
 			//		// Копирование шрифтов
-			//		dirs = grunt.file.expand({cwd: 'public/app/' + path + '/fonts/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+			//		dirs = grunt.file.expand({cwd: 'public/app/' + project + '/fonts/tmp/source_docs_files/user/projects/' + project + '/'}, '*');
 			//		for(var j = 0; j < dirs.length; j++) {
 			//			copyOptions['source_fonts' + j] = {
 			//				files: [
-			//					{expand: true, cwd: 'public/app/' + path + '/fonts/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/fonts', src: '**/*', dest: 'public/app/' + path + '/fonts'}
+			//					{expand: true, cwd: 'public/app/' + project + '/fonts/tmp/source_docs_files/user/projects/' + project + '/' + dirs[j] + '/fonts', src: '**/*', dest: 'public/app/' + path + '/fonts'}
 			//				]
 			//			}
 			//			run_task('copy', 'source_fonts' + j, copyOptions);
 			//		}
 			//
 			//		// Копирование скриптов
-			//		dirs = grunt.file.expand({cwd: 'public/app/' + path + '/js/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+			//		dirs = grunt.file.expand({cwd: 'public/app/' + project + '/js/tmp/source_docs_files/user/projects/' + project + '/'}, '*');
 			//		for(var j = 0; j < dirs.length; j++) {
 			//			copyOptions['source_js' + j] = {
 			//				files: [
-			//					{expand: true, cwd: 'public/app/' + path + '/js/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/js', src: '**/*', dest: 'public/app/' + path + '/js'}
+			//					{expand: true, cwd: 'public/app/' + project + '/js/tmp/source_docs_files/user/projects/' + project + '/' + dirs[j] + '/js', src: '**/*', dest: 'public/app/' + path + '/js'}
 			//				]
 			//			}
 			//			run_task('copy', 'source_js' + j, copyOptions);
 			//		}
 			//
 			//		// Копирование стилей
-			//		dirs = grunt.file.expand({cwd: 'public/app/' + path + '/stylesheets/tmp/source_docs_files/user/projects/' + path + '/'}, '*');
+			//		dirs = grunt.file.expand({cwd: 'public/app/' + project + '/stylesheets/tmp/source_docs_files/user/projects/' + project + '/'}, '*');
 			//		for(var j = 0; j < dirs.length; j++) {
 			//			copyOptions['source_stylesheets' + j] = {
 			//				files: [
-			//					{expand: true, cwd: 'public/app/' + path + '/stylesheets/tmp/source_docs_files/user/projects/' + path + '/' + dirs[j] + '/stylesheets', src: '**/*', dest: 'public/app/' + path + '/stylesheets'}
+			//					{expand: true, cwd: 'public/app/' + project + '/stylesheets/tmp/source_docs_files/user/projects/' + project + '/' + dirs[j] + '/stylesheets', src: '**/*', dest: 'public/app/' + path + '/stylesheets'}
 			//				]
 			//			}
 			//			run_task('copy', 'source_stylesheets' + j, copyOptions);
 			//		}
 			//	});
-			//})(path);
+			//})(project);
 
 
 		}
 
 		for(var i = 0; i < options.projects.length; i++) {
-			//run_task('readFolders' + options.paths[i]);
-			//run_task('clean', 'sourceImages' + options.paths[i], cleanOptions);
-			//run_task('clean', 'sourceCss' + options.paths[i], cleanOptions);
-			//run_task('clean', 'sourceJs' + options.paths[i], cleanOptions);
-			//run_task('clean', 'sourceFonts' + options.paths[i], cleanOptions);
+			//run_task('readFolders' + options.projects[i]);
+			//run_task('clean', 'sourceImages' + options.projects[i], cleanOptions);
+			//run_task('clean', 'sourceCss' + options.projects[i], cleanOptions);
+			//run_task('clean', 'sourceJs' + options.projects[i], cleanOptions);
+			//run_task('clean', 'sourceFonts' + options.projects[i], cleanOptions);
 		}
 
 
