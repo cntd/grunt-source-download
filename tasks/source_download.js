@@ -116,7 +116,8 @@ module.exports = function (grunt) {
 			//};
 			copyOptions['source_copy' + project] = {
 				files: [
-					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{sass,js,eot,svg,ttf,woff,woff2,otf,jpg,png,gif}'], dest: 'public/' + options.path + '/' + project},
+					// .{sass,scss,js,eot,svg,ttf,woff,woff2,otf,jpg,png,gif}
+					{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*'], dest: 'public/' + options.path + '/' + project},
 					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.js'], dest: 'public/' + options.path + '/' + project},
 					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{eot,svg,ttf,woff,woff2,otf}'], dest: 'public/' + options.path + '/' + project},
 					//{expand: true, cwd: 'tmp/source_docs_files/user/projects/' + project, src: ['**/*.{jpg,png,gif}'], dest: 'public/' + options.path + '/' + project}
